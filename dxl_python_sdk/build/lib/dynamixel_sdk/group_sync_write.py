@@ -49,19 +49,15 @@ class GroupSyncWrite:
             self.param.extend(self.data_dict[dxl_id])
 
     def addParam(self, dxl_id, data):
-        
         if dxl_id in self.data_dict:  # dxl_id already exist
-            
             return False
 
         if len(data) > self.data_length:  # input data is longer than set
-            
             return False
-        
+
         self.data_dict[dxl_id] = data
-        
+
         self.is_param_changed = True
-        
         return True
 
     def removeParam(self, dxl_id):
