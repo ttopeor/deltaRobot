@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import rospy
-from std_msgs.msg import Int32MultiArray
+from deltarobot.msg import *
 
 import os
 
@@ -113,14 +113,17 @@ else:
     print("Dynamixel#%d has been successfully connected" % DXL3_ID)
 
 
-def callback(goal_positions):
-    zero1 = 0
-    zero1 = 0
-    zero3 = 0
-    pos1=int(-(goal_positions[0]-zero1)*700/90+753)
-    pos2=int(-(goal_positions[1]-zero2)*700/90+753)
-    pos3=int(-(goal_positions[2]-zero3)*700/90+753)
-
+def callback(data):
+    
+    #zero1 = 0
+    #zero1 = 0
+    #zero3 = 0
+    #pos1=int(-(goal_positions[0]-zero1)*700/90+753)
+    #pos2=int(-(goal_positions[1]-zero2)*700/90+753)
+    #pos3=int(-(goal_positions[2]-zero3)*700/90+753)
+    pos1 = int(data.set_dxl_pos1*1023/300)
+    pos2 = int(data.set_dxl_pos2*1023/300)
+    pos3 = int(data.set_dxl_pos3*1023/300)
     # Allocate goal position value into byte array
     param_goal_position1 = [DXL_LOBYTE(DXL_LOWORD(pos1)), DXL_HIBYTE(DXL_LOWORD(pos1))]
     param_goal_position2 = [DXL_LOBYTE(DXL_LOWORD(pos2)), DXL_HIBYTE(DXL_LOWORD(pos2))]
@@ -154,14 +157,13 @@ def callback(goal_positions):
 
 def ROS_listener():
     rospy.init_node('dxl_A12', anonymous=True)
-    rospy.Subscriber("set_position", Int32MultiArray, callback)
+    rospy.Subscriber("set_dxl_position", SetDxlPosition, callback)
     rospy.spin()
-
 if __name__ == '__main__':
     try:
         ROS_listener()
 
-    except KeyboardInterrupt:
+    except rospy.ROSInterruptException:
         # Disable Dynamixel#1 Torque
         dxl_comm_result, dxl_error = packetHandler.write1ByteTxRx(portHandler, DXL1_ID, ADDR_MX_TORQUE_ENABLE, TORQUE_DISABLE)
         if dxl_comm_result != COMM_SUCCESS:

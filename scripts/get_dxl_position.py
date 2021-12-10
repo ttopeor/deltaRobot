@@ -1,8 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import rospy
-from std_msgs.msg import Int32MultiArray
+NAME = 'get_dxl_position_server'
 
+from deltarobot.srv import *
+import rospy
 import os
 import time
 
@@ -85,45 +86,49 @@ else:
     print("Press any key to terminate...")
     getch()
     quit()
+def get_dxl_position(req):
+    # Read Dynamixel#1 present position
+    dxl1_present_position, dxl_comm_result, dxl_error = packetHandler.read2ByteTxRx(portHandler, DXL1_ID, ADDR_MX_PRESENT_POSITION)
+    if dxl_comm_result != COMM_SUCCESS:
+        print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+    elif dxl_error != 0:
+        print("%s" % packetHandler.getRxPacketError(dxl_error))
 
-def main():
-    rospy.init_node('dxl_A12_encoder', anonymous=True)
-    pub = rospy.Publisher('get_position', Int32MultiArray, queue_size=10)
-    rate = rospy.Rate(10) # 10hz
-    while not rospy.is_shutdown():
-        # Read Dynamixel#1 present position
-        dxl1_present_position, dxl_comm_result, dxl_error = packetHandler.read2ByteTxRx(portHandler, DXL1_ID, ADDR_MX_PRESENT_POSITION)
-        if dxl_comm_result != COMM_SUCCESS:
-            print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
-        elif dxl_error != 0:
-            print("%s" % packetHandler.getRxPacketError(dxl_error))
+    # Read Dynamixel#2 present position
+    dxl2_present_position, dxl_comm_result, dxl_error = packetHandler.read2ByteTxRx(portHandler, DXL2_ID, ADDR_MX_PRESENT_POSITION)
+    if dxl_comm_result != COMM_SUCCESS:
+        print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+    elif dxl_error != 0:
+        print("%s" % packetHandler.getRxPacketError(dxl_error))
+    
+    # Read Dynamixel#3 present position
+    dxl3_present_position, dxl_comm_result, dxl_error = packetHandler.read2ByteTxRx(portHandler, DXL3_ID, ADDR_MX_PRESENT_POSITION)
+    if dxl_comm_result != COMM_SUCCESS:
+        print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+    elif dxl_error != 0:
+        print("%s" % packetHandler.getRxPacketError(dxl_error))
 
-        # Read Dynamixel#2 present position
-        dxl2_present_position, dxl_comm_result, dxl_error = packetHandler.read2ByteTxRx(portHandler, DXL2_ID, ADDR_MX_PRESENT_POSITION)
-        if dxl_comm_result != COMM_SUCCESS:
-            print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
-        elif dxl_error != 0:
-            print("%s" % packetHandler.getRxPacketError(dxl_error))
-        
-        # Read Dynamixel#3 present position
-        dxl3_present_position, dxl_comm_result, dxl_error = packetHandler.read2ByteTxRx(portHandler, DXL3_ID, ADDR_MX_PRESENT_POSITION)
-        if dxl_comm_result != COMM_SUCCESS:
-            print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
-        elif dxl_error != 0:
-            print("%s" % packetHandler.getRxPacketError(dxl_error))
+    #print("[ID:%03d]  Pos:%03d\t [ID:%03d]  Pos:%03d\t [ID:%03d]  Pos:%03d" % (DXL1_ID, dxl1_present_position, DXL2_ID, dxl2_present_position,DXL3_ID, dxl3_present_position))
+    
+    #dxl_pos1=-dxl1_present_position*90/700+753*90/700
+    #dxl_pos2=-dxl1_present_position*90/700+753*90/700
+    #dxl_pos3=-dxl1_present_position*90/700+753*90/700
+    dxl_pos1 = round(dxl1_present_position*300/1023,2)
+    dxl_pos2 = round(dxl2_present_position*300/1023,2)
+    dxl_pos3 = round(dxl3_present_position*300/1023,2)
+    return GetDxlPositionResponse(dxl_pos1,dxl_pos2,dxl_pos3)
+    
+def get_dxl_position_server():
+    rospy.init_node(NAME)
+    s = rospy.Service('get_dxl_position', GetDxlPosition, get_dxl_position)
+    print ("Ready to get positons of dxl motors")
+    # spin() keeps Python from exiting until node is shutdown
+    rospy.spin()
 
-        print("[ID:%03d]  PresPos:%03d\t [ID:%03d]  PresPos:%03d\t [ID:%03d]  PresPos:%03d" % (DXL1_ID, dxl1_present_position, DXL2_ID, dxl2_present_position,DXL3_ID, dxl3_present_position))
-        #time.sleep(0.05)
-
-        present_positions=[dxl1_present_position,dxl2_present_position,dxl3_present_position]
-
-        rospy.loginfo(present_positions)
-        pub.publish(present_positions)
-        rate.sleep()
 
 if __name__ == '__main__':
     try:
-        main()
+        get_dxl_position_server()
     except rospy.ROSInterruptException:
         portHandler.closePort()
         print('port closed')
