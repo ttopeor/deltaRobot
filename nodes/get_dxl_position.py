@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import rospy
+from std_msgs.msg import Int32MultiArray
 
 import os
+import time
 
 if os.name == 'nt':
     import msvcrt
@@ -36,6 +39,7 @@ PROTOCOL_VERSION            = 1.0               # See which protocol version is 
 # Default setting
 DXL1_ID                     = 1                 # Dynamixel#1 ID : 1
 DXL2_ID                     = 2                 # Dynamixel#1 ID : 2
+DXL3_ID                     = 3                 # Dynamixel#1 ID : 3
 BAUDRATE                    = 57600             # Dynamixel default baudrate : 57600
 DEVICENAME                  = '/dev/ttyUSB1'    # Check which port is being used on your controller
                                                 # ex) Windows: "COM1"   Linux: "/dev/ttyUSB0" Mac: "/dev/tty.usbserial-*"
@@ -82,23 +86,45 @@ else:
     getch()
     quit()
 
-while 1:
-    # Read Dynamixel#1 present position
-    dxl1_present_position, dxl_comm_result, dxl_error = packetHandler.read2ByteTxRx(portHandler, DXL1_ID, ADDR_MX_PRESENT_POSITION)
-    if dxl_comm_result != COMM_SUCCESS:
-        print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
-    elif dxl_error != 0:
-        print("%s" % packetHandler.getRxPacketError(dxl_error))
+def main():
+    rospy.init_node('dxl_A12_encoder', anonymous=True)
+    pub = rospy.Publisher('get_position', Int32MultiArray, queue_size=10)
+    rate = rospy.Rate(10) # 10hz
+    while not rospy.is_shutdown():
+        # Read Dynamixel#1 present position
+        dxl1_present_position, dxl_comm_result, dxl_error = packetHandler.read2ByteTxRx(portHandler, DXL1_ID, ADDR_MX_PRESENT_POSITION)
+        if dxl_comm_result != COMM_SUCCESS:
+            print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+        elif dxl_error != 0:
+            print("%s" % packetHandler.getRxPacketError(dxl_error))
 
-    # Read Dynamixel#2 present position
-    dxl2_present_position, dxl_comm_result, dxl_error = packetHandler.read2ByteTxRx(portHandler, DXL2_ID, ADDR_MX_PRESENT_POSITION)
-    if dxl_comm_result != COMM_SUCCESS:
-        print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
-    elif dxl_error != 0:
-        print("%s" % packetHandler.getRxPacketError(dxl_error))
+        # Read Dynamixel#2 present position
+        dxl2_present_position, dxl_comm_result, dxl_error = packetHandler.read2ByteTxRx(portHandler, DXL2_ID, ADDR_MX_PRESENT_POSITION)
+        if dxl_comm_result != COMM_SUCCESS:
+            print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+        elif dxl_error != 0:
+            print("%s" % packetHandler.getRxPacketError(dxl_error))
+        
+        # Read Dynamixel#3 present position
+        dxl3_present_position, dxl_comm_result, dxl_error = packetHandler.read2ByteTxRx(portHandler, DXL3_ID, ADDR_MX_PRESENT_POSITION)
+        if dxl_comm_result != COMM_SUCCESS:
+            print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+        elif dxl_error != 0:
+            print("%s" % packetHandler.getRxPacketError(dxl_error))
 
-    print("[ID:%03d]  PresPos:%03d\t[ID:%03d]  PresPos:%03d" % (DXL1_ID, dxl1_present_position, DXL2_ID, dxl2_present_position))
+        print("[ID:%03d]  PresPos:%03d\t [ID:%03d]  PresPos:%03d\t [ID:%03d]  PresPos:%03d" % (DXL1_ID, dxl1_present_position, DXL2_ID, dxl2_present_position,DXL3_ID, dxl3_present_position))
+        #time.sleep(0.05)
 
+        present_positions=[dxl1_present_position,dxl2_present_position,dxl3_present_position]
 
-# Close port
-portHandler.closePort()
+        rospy.loginfo(present_positions)
+        pub.publish(present_positions)
+        rate.sleep()
+
+if __name__ == '__main__':
+    try:
+        main()
+    except rospy.ROSInterruptException:
+        portHandler.closePort()
+        print('port closed')
+        pass
