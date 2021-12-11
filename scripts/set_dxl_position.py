@@ -47,7 +47,7 @@ TORQUE_ENABLE               = 1                 # Value for enabling the torque
 TORQUE_DISABLE              = 0                 # Value for disabling the torque
 DXL_MINIMUM_POSITION_VALUE  = 100           # Dynamixel will rotate between this value
 DXL_MAXIMUM_POSITION_VALUE  = 900            # and this value (note that the Dynamixel would not move when the position value is out of movable range. Check e-manual about the range of the Dynamixel you use.)
-DXL_MOVING_STATUS_THRESHOLD = 3                # Dynamixel moving status threshold
+DXL_MOVING_STATUS_THRESHOLD = 1                # Dynamixel moving status threshold
 
 index = 0
 
@@ -114,16 +114,17 @@ else:
 
 
 def callback(data):
-    
+    #set_dxl_pos is from -220 to 80
+
     #zero1 = 0
     #zero1 = 0
     #zero3 = 0
     #pos1=int(-(goal_positions[0]-zero1)*700/90+753)
     #pos2=int(-(goal_positions[1]-zero2)*700/90+753)
     #pos3=int(-(goal_positions[2]-zero3)*700/90+753)
-    pos1 = int(data.set_dxl_pos1*1023/300)
-    pos2 = int(data.set_dxl_pos2*1023/300)
-    pos3 = int(data.set_dxl_pos3*1023/300)
+    pos1 = int(round((data.set_dxl_pos1+221)*1023/300))
+    pos2 = int(round((data.set_dxl_pos2+230)*1023/300))
+    pos3 = int(round((data.set_dxl_pos3+235)*1023/300))
     # Allocate goal position value into byte array
     param_goal_position1 = [DXL_LOBYTE(DXL_LOWORD(pos1)), DXL_HIBYTE(DXL_LOWORD(pos1))]
     param_goal_position2 = [DXL_LOBYTE(DXL_LOWORD(pos2)), DXL_HIBYTE(DXL_LOWORD(pos2))]

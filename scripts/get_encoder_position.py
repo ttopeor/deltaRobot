@@ -37,9 +37,21 @@ def get_encoder_position(req):
     #encoder_pos1 = round(write_req(ser,1)*300/1023,2)
     #encoder_pos2 = round(write_req(ser,2)*300/1023,2)
     #encoder_pos3 = round(write_req(ser,3)*300/1023,2)
-    encoder_pos1 = write_req(ser,1)
-    encoder_pos2 = write_req(ser,2)
-    encoder_pos3 = write_req(ser,3)
+    res1 = write_req(ser,1)
+    res2 = write_req(ser,2)
+    res3 = write_req(ser,3)
+
+    if (res1 > 500):
+        res1 = -(1023-res1)
+    if (res2 > 500):
+        res2 =-(1023-res2)
+    if (res3 > 500):
+        res3 =-(1023-res3)
+        
+    encoder_pos1 = round(((res1-275)*360/1023),2)
+    encoder_pos2 = round(((res2-291)*360/1023),2)
+    encoder_pos3 = round(((res3-284)*360/1023),2)
+    
     return GetEncoderPositionResponse(encoder_pos1,encoder_pos2,encoder_pos3)
 
 
