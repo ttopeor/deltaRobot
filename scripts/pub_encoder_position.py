@@ -32,7 +32,7 @@ def write_req(ser,encoder_num):
 def encoderPosition_pubulisher():
     pub = rospy.Publisher('encoder_position', EncoderPosition, queue_size=1)
     rospy.init_node('encoder_position_pub', anonymous=True)
-    r = rospy.Rate(10) #10hz
+    r = rospy.Rate(50) 
 
 
     while not rospy.is_shutdown():
