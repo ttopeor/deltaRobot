@@ -1,0 +1,7 @@
+<launch>
+    <node name="pub_dxl_position" pkg="deltarobot" type="pub_dxl_position.py" />
+    <node name="set_dxl_speed" pkg="deltarobot" type="set_dxl_speed.py" />
+    <node name="pub_encoder_position" pkg="deltarobot" type="pub_encoder_position.py" />
+    <node name="set_end_position" pkg="deltarobot" type="set_end_position.py" />
+    
+</launch>

@@ -25,13 +25,13 @@ from dynamixel_sdk import *                    # Uses Dynamixel SDK library
 
 # Control table address
 ADDR_MX_TORQUE_ENABLE      = 24               # Control table address is different in Dynamixel model
-ADDR_MX_GOAL_POSITION      = 30
+ADDR_MX_GOAL_SPEED         = 32
 ADDR_MX_PRESENT_POSITION   = 36
 
 # Data Byte Length
 LEN_MX_GOAL_POSITION       = 2
 LEN_MX_PRESENT_POSITION    = 2
-
+LEN_MX_MOVING_SPEED        = 2
 # Protocol version
 PROTOCOL_VERSION            = 1.0               # See which protocol version is used in the Dynamixel
 
@@ -51,6 +51,13 @@ DXL_MOVING_STATUS_THRESHOLD = 1                # Dynamixel moving status thresho
 
 index = 0
 
+dxl_pos1=0
+dxl_pos2=0
+dxl_pos3=0
+
+spd1 = 0
+spd2 = 0
+spd3 = 0
 
 # Initialize PortHandler instance
 # Set the port path
@@ -63,7 +70,7 @@ portHandler = PortHandler(DEVICENAME)
 packetHandler = PacketHandler(PROTOCOL_VERSION)
 
 # Initialize GroupSyncWrite instance
-groupSyncWrite = GroupSyncWrite(portHandler, packetHandler, ADDR_MX_GOAL_POSITION, LEN_MX_GOAL_POSITION)
+groupSyncWrite = GroupSyncWrite(portHandler, packetHandler, ADDR_MX_GOAL_SPEED, LEN_MX_MOVING_SPEED)
 
 # Open port
 if portHandler.openPort():
@@ -112,38 +119,110 @@ elif dxl_error != 0:
 else:
     print("Dynamixel#%d has been successfully connected" % DXL3_ID)
 
+def update_dxl_position(data):
+    global dxl_pos1
+    global dxl_pos2
+    global dxl_pos3
+
+    global spd1
+    global spd2
+    global spd3
+
+    dxl_pos1 = data.dxl_pos1
+    dxl_pos2 = data.dxl_pos2
+    dxl_pos3 = data.dxl_pos3
+
+    if (((dxl_pos1<-200)and(spd1>1024)) or ((dxl_pos1>50)and(spd1<1024))):
+        spd1 = 1024
+        param_goal_speed1 = [DXL_LOBYTE(DXL_LOWORD(spd1)), DXL_HIBYTE(DXL_LOWORD(spd1))]
+        dxl_addparam_result = groupSyncWrite.addParam(DXL1_ID, param_goal_speed1)
+        if dxl_addparam_result != True:
+            print("[ID:%03d] groupSyncWrite addparam failed" % DXL1_ID)
+            quit()
+        dxl_comm_result = groupSyncWrite.txPacket()
+        if dxl_comm_result != COMM_SUCCESS:
+            print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+        groupSyncWrite.clearParam()
+    if (((dxl_pos2<-200)and (spd2>1024)) or ((dxl_pos2>50)and(spd2<1024))):
+        spd2 = 1024
+        param_goal_speed2 = [DXL_LOBYTE(DXL_LOWORD(spd2)), DXL_HIBYTE(DXL_LOWORD(spd2))]
+        dxl_addparam_result = groupSyncWrite.addParam(DXL2_ID, param_goal_speed2)
+        if dxl_addparam_result != True:
+            print("[ID:%03d] groupSyncWrite addparam failed" % DXL2_ID)
+            quit()
+        dxl_comm_result = groupSyncWrite.txPacket()
+        if dxl_comm_result != COMM_SUCCESS:
+            print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+        groupSyncWrite.clearParam()
+    if (((dxl_pos3<-200)and (spd3>1024)) or ((dxl_pos3>50)and(spd3<1024))):
+        spd3 = 1024
+        param_goal_speed3 = [DXL_LOBYTE(DXL_LOWORD(spd3)), DXL_HIBYTE(DXL_LOWORD(spd3))]
+        dxl_addparam_result = groupSyncWrite.addParam(DXL3_ID, param_goal_speed3)
+        if dxl_addparam_result != True:
+            print("[ID:%03d] groupSyncWrite addparam failed" % DXL3_ID)
+            quit()
+            # Syncwrite goal position
+        dxl_comm_result = groupSyncWrite.txPacket()
+        if dxl_comm_result != COMM_SUCCESS:
+            print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+
+        # Clear syncwrite parameter storage
+        groupSyncWrite.clearParam()
 
 def callback(data):
-    #set_dxl_pos is from -220 to 80
+    global dxl_pos1
+    global dxl_pos2
+    global dxl_pos3
 
-    #zero1 = 0
-    #zero1 = 0
-    #zero3 = 0
-    #pos1=int(-(goal_positions[0]-zero1)*700/90+753)
-    #pos2=int(-(goal_positions[1]-zero2)*700/90+753)
-    #pos3=int(-(goal_positions[2]-zero3)*700/90+753)
-    pos1 = int(round((data.set_dxl_pos1+221)*1023/300))
-    pos2 = int(round((data.set_dxl_pos2+230)*1023/300))
-    pos3 = int(round((data.set_dxl_pos3+235)*1023/300))
-    # Allocate goal position value into byte array
-    param_goal_position1 = [DXL_LOBYTE(DXL_LOWORD(pos1)), DXL_HIBYTE(DXL_LOWORD(pos1))]
-    param_goal_position2 = [DXL_LOBYTE(DXL_LOWORD(pos2)), DXL_HIBYTE(DXL_LOWORD(pos2))]
-    param_goal_position3 = [DXL_LOBYTE(DXL_LOWORD(pos3)), DXL_HIBYTE(DXL_LOWORD(pos3))]
+    global spd1
+    global spd2
+    global spd3
+
+    if (data.dxl_spd1 < 0):
+        spd1 = -data.dxl_spd1 + 1024
+        if (spd1 > 2047):
+            spd1 = 2047
+    else:
+        spd1 = data.dxl_spd1 
+        if(spd1 > 1023):
+            spd1=1023
+    
+    if (data.dxl_spd2 < 0):
+        spd2 = -data.dxl_spd2 + 1024
+        if (spd2 > 2047):
+            spd2 = 2047
+    else:
+        spd2 = data.dxl_spd2
+        if(spd2 > 1023):
+            spd2=1023
+
+    if (data.dxl_spd3 < 0):
+        spd3 = -data.dxl_spd3 + 1024
+        if (spd3 > 2047):
+            spd3 = 2047
+    else:
+        spd3 = data.dxl_spd3   
+        if(spd3 > 1023):
+            spd3=1023
+
+    param_goal_speed1 = [DXL_LOBYTE(DXL_LOWORD(spd1)), DXL_HIBYTE(DXL_LOWORD(spd1))]
+    param_goal_speed2 = [DXL_LOBYTE(DXL_LOWORD(spd2)), DXL_HIBYTE(DXL_LOWORD(spd2))]
+    param_goal_speed3 = [DXL_LOBYTE(DXL_LOWORD(spd3)), DXL_HIBYTE(DXL_LOWORD(spd3))]
 
     # Add Dynamixel#1 goal position value to the Syncwrite parameter storage
-    dxl_addparam_result = groupSyncWrite.addParam(DXL1_ID, param_goal_position1)
+    dxl_addparam_result = groupSyncWrite.addParam(DXL1_ID, param_goal_speed1)
     if dxl_addparam_result != True:
         print("[ID:%03d] groupSyncWrite addparam failed" % DXL1_ID)
         quit()
 
     # Add Dynamixel#2 goal position value to the Syncwrite parameter storage
-    dxl_addparam_result = groupSyncWrite.addParam(DXL2_ID, param_goal_position2)
+    dxl_addparam_result = groupSyncWrite.addParam(DXL2_ID, param_goal_speed2)
     if dxl_addparam_result != True:
         print("[ID:%03d] groupSyncWrite addparam failed" % DXL2_ID)
         quit()
 
     # Add Dynamixel#2 goal position value to the Syncwrite parameter storage
-    dxl_addparam_result = groupSyncWrite.addParam(DXL3_ID, param_goal_position3)
+    dxl_addparam_result = groupSyncWrite.addParam(DXL3_ID, param_goal_speed3)
     if dxl_addparam_result != True:
         print("[ID:%03d] groupSyncWrite addparam failed" % DXL3_ID)
         quit()
@@ -158,7 +237,8 @@ def callback(data):
 
 def ROS_listener():
     rospy.init_node('dxl_A12', anonymous=True)
-    rospy.Subscriber("set_dxl_position", SetDxlPosition, callback)
+    rospy.Subscriber("set_dxl_speed", DxlSpeed, callback)
+    #rospy.Subscriber("dxl_position", DxlPosition, update_dxl_position)
     rospy.spin()
     
 if __name__ == '__main__':

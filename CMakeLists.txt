@@ -51,6 +51,10 @@ find_package(catkin REQUIRED COMPONENTS
  add_message_files(
    FILES
    SetDxlPosition.msg
+   SetEndPosition.msg
+   EncoderPosition.msg
+   DxlPosition.msg
+   DxlSpeed.msg
  )
 
 ## Generate services in the 'srv' folder

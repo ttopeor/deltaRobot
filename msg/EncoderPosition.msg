@@ -1,0 +1,3 @@
+float64 encoder_pos1
+float64 encoder_pos2
+float64 encoder_pos3

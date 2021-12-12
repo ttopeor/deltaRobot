@@ -1,0 +1,3 @@
+float64 dxl_pos1
+float64 dxl_pos2
+float64 dxl_pos3
