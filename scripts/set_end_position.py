@@ -24,7 +24,7 @@ n = (1/2)*b-(1/2)*a
 def callback(data):
     
 
-    p = [0,data.set_end_pos1,data.set_end_pos2,-data.set_end_pos3-93.82]
+    p = [0,data.set_end_pos1,data.set_end_pos2,data.set_end_pos3] #93.82
 
     G = [0,2*l_a*(p[2]+k), -l_a*(math.sqrt(3)*(p[1]+m)+p[2]+n), l_a*(math.sqrt(3)*(p[1]-m)-p[2]-n)]
     F = [0,2*p[3]*l_a,2*p[3]*l_a,2*p[3]*l_a]

@@ -1,0 +1,3 @@
+float64 end_pos1
+float64 end_pos2
+float64 end_pos3

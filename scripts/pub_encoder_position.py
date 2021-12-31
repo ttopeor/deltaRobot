@@ -29,6 +29,7 @@ def write_req(ser,encoder_num):
     #print(res)
     return res
 
+
 def encoderPosition_pubulisher():
     pub = rospy.Publisher('encoder_position', EncoderPosition, queue_size=1)
     rospy.init_node('encoder_position_pub', anonymous=True)
@@ -49,9 +50,9 @@ def encoderPosition_pubulisher():
         if (res3 > 500):
             res3 =-(1023-res3)
             
-        pos1 = round(((res1-275)*360/1023),2)
-        pos2 = round(((res2-288)*360/1023),2)
-        pos3 = round(((res3-285)*360/1023),2)
+        pos1 = -round(((res1-275)*360/1023),2)
+        pos2 = -round(((res2-275)*360/1023),2)
+        pos3 = -round(((res3-275)*360/1023),2)
 
 
         encoderPosition = EncoderPosition()

@@ -55,6 +55,8 @@ find_package(catkin REQUIRED COMPONENTS
    EncoderPosition.msg
    DxlPosition.msg
    DxlSpeed.msg
+   EndPosition.msg
+   EndForce.msg
  )
 
 ## Generate services in the 'srv' folder
@@ -62,6 +64,8 @@ add_service_files(
    FILES
    GetDxlPosition.srv
    GetEncoderPosition.srv
+   GetEndForce.srv
+   GetEndPosition.srv
  )
 
 ## Generate actions in the 'action' folder

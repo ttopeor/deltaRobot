@@ -77,7 +77,6 @@ else:
     getch()
     quit()
 
-
 # Set port baudrate
 if portHandler.setBaudRate(BAUDRATE):
     print("Succeeded to change the baudrate")
@@ -113,9 +112,9 @@ def get_dxl_position(req):
     #dxl_pos1=-dxl1_present_position*90/700+753*90/700
     #dxl_pos2=-dxl1_present_position*90/700+753*90/700
     #dxl_pos3=-dxl1_present_position*90/700+753*90/700
-    dxl_pos1 = round((dxl1_present_position*300/1023)-221,2)
-    dxl_pos2 = round((dxl2_present_position*300/1023)-230,2)
-    dxl_pos3 = round((dxl3_present_position*300/1023)-235,2)
+    dxl_pos1 = -round((dxl1_present_position*300/1023)-185,2)
+    dxl_pos2 = -round((dxl2_present_position*300/1023)-186,2)
+    dxl_pos3 = -round((dxl3_present_position*300/1023)-190,2)
     return GetDxlPositionResponse(dxl_pos1,dxl_pos2,dxl_pos3)
     
 def get_dxl_position_server():

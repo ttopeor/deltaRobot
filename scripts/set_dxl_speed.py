@@ -129,30 +129,30 @@ def callback(data):
     global spd3
 
 
-    if (data.dxl_spd1 < 0):
-        spd1 = -data.dxl_spd1 + 1024
+    if (data.dxl_spd1 > 0):
+        spd1 = data.dxl_spd1 + 1024
         if (spd1 > 2047):
             spd1 = 2047
     else:
-        spd1 = data.dxl_spd1 
+        spd1 = -data.dxl_spd1 
         if(spd1 > 1023):
             spd1=1023
     
-    if (data.dxl_spd2 < 0):
-        spd2 = -data.dxl_spd2 + 1024
+    if (data.dxl_spd2 > 0):
+        spd2 = data.dxl_spd2 + 1024
         if (spd2 > 2047):
             spd2 = 2047
     else:
-        spd2 = data.dxl_spd2
+        spd2 = -data.dxl_spd2
         if(spd2 > 1023):
             spd2=1023
 
-    if (data.dxl_spd3 < 0):
-        spd3 = -data.dxl_spd3 + 1024
+    if (data.dxl_spd3 > 0):
+        spd3 = data.dxl_spd3 + 1024
         if (spd3 > 2047):
             spd3 = 2047
     else:
-        spd3 = data.dxl_spd3   
+        spd3 = -data.dxl_spd3   
         if(spd3 > 1023):
             spd3=1023
 
