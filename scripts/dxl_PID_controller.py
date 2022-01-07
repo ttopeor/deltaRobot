@@ -163,8 +163,8 @@ def pub_force_info(encoder_pos,dxl_pos):
     
     EndForce_msg = EndForce()
     EndForce_msg.end_force_x = round(force_vector[0],2)
-    EndForce_msg.end_force_y = round(force_vector[1]-0.47,2)
-    EndForce_msg.end_force_z = round(force_vector[2]+1.67,2)
+    EndForce_msg.end_force_y = round(force_vector[1],2)
+    EndForce_msg.end_force_z = round(force_vector[2],2)
 
     pub_end_force.publish(EndForce_msg)
 
@@ -252,9 +252,9 @@ def callback(data):
         dxl_spd2 =  int(round(MV2))
         dxl_spd3 =  int(round(MV3))
         
-        died_speed1 = 36
-        died_speed2 = 28
-        died_speed3 = 50
+        died_speed1 = 26
+        died_speed2 = 18
+        died_speed3 = 40
         
         if dxl_spd1>0:
             dxl_spd1 = dxl_spd1+died_speed1
