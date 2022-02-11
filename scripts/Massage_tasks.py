@@ -5,10 +5,10 @@ from deltarobot.srv import *
 import time
 import pandas as pd
 
-action = pd.read_excel('massage_tasks/rolling.xlsx', sheet_name='Sheet1') 
+#action = pd.read_excel('massage_tasks/rolling.xlsx', sheet_name='Sheet1') 
 #action = pd.read_excel('massage_tasks/pressing.xlsx', sheet_name='Sheet1') 
 #action = pd.read_excel('massage_tasks/pushing.xlsx', sheet_name='Sheet1') 
-#action = pd.read_excel('massage_tasks/taping.xlsx', sheet_name='Sheet1') 
+action = pd.read_excel('massage_tasks/taping.xlsx', sheet_name='Sheet1') 
 
 action = action.values.tolist()
 
@@ -109,11 +109,11 @@ def dxlPosition_pubulisher():
             t = t + 1/freq
         else:
             t =0
-            df_force = pd.DataFrame(force_data, columns = ['force_x', 'force_y','force_z'])
-            df_force.to_excel (r'test_results/export_force_data.xlsx', index = False, header=True)
-            df_pos = pd.DataFrame(pos_data, columns = ['end_pos_1', 'end_pos_2','end_pos_3'])
-            df_pos.to_excel (r'test_results/export_pos_data.xlsx', index = False, header=True)
-            exit()
+            #df_force = pd.DataFrame(force_data, columns = ['force_x', 'force_y','force_z'])
+            #df_force.to_excel (r'test_results/export_force_data.xlsx', index = False, header=True)
+            #df_pos = pd.DataFrame(pos_data, columns = ['end_pos_1', 'end_pos_2','end_pos_3'])
+            #df_pos.to_excel (r'test_results/export_pos_data.xlsx', index = False, header=True)
+            #exit()
         r.sleep()
 
 
